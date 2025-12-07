@@ -1,0 +1,9 @@
+1. When the developer needs to redesign the UI or update Model logic, without affecting other components of an app. Model: Movie and PopularMoviesResponse, View: MainActivity and DetailsActivity, ViewModel: MovieViewModel, MovieRepository and MovieAdapter.
+
+2. The views didn't need to use FindViewById to call the data and can directly call upon the LiveData from the ViewModel.
+
+3. To make sure there is only one database that exists throughout various threads, and it will be very inefficient where ever the database is stored if every thread creates its own database.
+
+4. The model doesn't need to know where the data comes from.
+
+5. Room.databaseCallback, foreground Service, ViewModel, LiveData.
