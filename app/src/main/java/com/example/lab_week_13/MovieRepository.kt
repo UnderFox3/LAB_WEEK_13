@@ -3,13 +3,16 @@ package com.example.lab_week_13
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.lab_week_13.api.MovieService
+import com.example.lab_week_13.database.MovieDao
+import com.example.lab_week_13.database.MovieDatabase
 import com.example.lab_week_13.model.Movie
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class MovieRepository(private val movieService: MovieService) {
+class MovieRepository(private val movieService: MovieService,
+    private val movieDatabase: MovieDatabase) {
     private val apiKey = "3583e371e4807307e6f0480a98db2eb3"
     private val movieLiveData = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>>
@@ -21,7 +24,16 @@ class MovieRepository(private val movieService: MovieService) {
 
     fun fetchMovies(): Flow<List<Movie>> {
         return flow {
-            emit(movieService.getPopularMovies(apiKey).results)
+            val movieDao: MovieDao = movieDatabase.movieDao()
+            val savedMovies = movieDao.getMovies()
+
+            if(savedMovies.isEmpty()) {
+                val movies = movieService.getPopularMovies(apiKey).results
+                movieDao.addMovies(movies)
+                emit(movies)
+            } else {
+                emit(savedMovies)
+            }
         }.flowOn(Dispatchers.IO)
     }
 }
